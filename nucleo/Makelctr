@@ -1,0 +1,39 @@
+CC = g++
+# CC = icc
+CFLAGS = $(F) -ansi -pedantic -Wall -fpermissive -fPIC
+LIBGEN = ar
+
+all:
+	make -f Makelctr libreria F="$(F) -O2"
+
+libreria: Lector.o FnsClasificacion.o FnsOrdClas.o FnsAux.o Language.o
+	@echo lib lector
+	$(LIBGEN) -r liblctr.a Lector.o FnsClasificacion.o FnsOrdClas.o FnsAux.o Language.o
+
+Lector.o: Lector.cpp
+	@echo Compiling... Lector.cpp
+	$(CC) $(CFLAGS) -c Lector.cpp 
+
+FnsClasificacion.o: FnsClasificacion.cpp
+	@echo Compiling... FnsClasificacion.cpp
+	$(CC) $(CFLAGS) -c FnsClasificacion.cpp -I ../FES/Extracto/ -I ../R8/SrcAdapted/ -I ../fann/fann-1.2.0/src/include -I .
+
+FnsOrdClas.o: FnsOrdClas.cpp
+	@echo Compiling... FnsOrdClas.cpp
+	$(CC) $(CFLAGS) -c FnsOrdClas.cpp -I ../NR++/genetic/  -DNOSHORTS \
+	-I ../FES/Extracto/ -I../NR++ -I../csdp/releases/6.0.1/include -I .
+
+FnsAux.o: FnsAux.cpp
+	@echo Compiling... FnsAux.cpp
+	$(CC) $(CFLAGS) -c FnsAux.cpp -I ../FES/Extracto/ 
+
+Language.o: Language.cpp
+	@echo Compiling... Language.cpp
+	$(CC) $(CFLAGS) -c Language.cpp 
+
+clean:
+	rm -f *.o *.a
+
+debug:
+	make -f Makelctr libreria F="$(F) -g"
+

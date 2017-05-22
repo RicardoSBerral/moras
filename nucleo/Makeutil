@@ -1,0 +1,49 @@
+CC = g++
+# CC = icc
+C = gcc
+CFLAGS = $(F) -ansi -pedantic -Wall -fpermissive
+LIBGEN = ar
+
+all:
+	make -f Makeutil utils F="$(F) -O2"
+
+utils: Matriz.o nrr.o UtilsGraf.o Utils.o genetic.o SpaceCubes.o OutputGenerator.o
+
+	$(LIBGEN) -r libutils.a Matriz.o nrr.o UtilsGraf.o \
+	Utils.o genetic.o SpaceCubes.o
+
+Matriz.o: Matriz.cpp
+	@echo Compiling... Matriz.cpp
+	$(CC) $(CFLAGS) -c Matriz.cpp -I ../NR++/
+
+nrr.o: ../NR++/nrr.cpp
+	@echo Compiling... ../NR++/nrr.cpp
+	$(CC) $(CFLAGS) -c ../NR++/nrr.cpp
+	cp nrr.o ../NR++/
+
+Utils.o: Utils.cpp
+	@echo Compiling... Utils.cpp
+	$(CC) $(CFLAGS) -c Utils.cpp -I ../FES/Extracto -I .
+
+UtilsGraf.o: UtilsGraf.cpp
+	@echo Compiling... UtilsGraf.cpp
+	$(CC) $(CFLAGS) -c UtilsGraf.cpp -I ../FES/Extracto -I .
+
+OutputGenerator.o: OutputGenerator.cpp
+	@echo Compiling... OutputGenerator.cpp
+	$(CC) $(CFLAGS) -c OutputGenerator.cpp -I ../FES/Extracto -I .
+
+genetic.o: ../NR++/genetic/genetic.c
+	@echo Compiling... genetic.c
+	make -C ../NR++/genetic/ F="$(F)"
+	cp ../NR++/genetic/genetic.o .
+	cp ../NR++/genetic/sort2.o .
+#	$(C) $(CFLAGS) -c ../NR++/genetic/genetic.c
+#	$(C) $(CFLAGS) -c ../NR++/genetic/sort2.c
+
+SpaceCubes.o: SpaceCubes.cpp
+	$(CC) $(CFLAGS) -c SpaceCubes.cpp -I ../FES/Extracto/ -I .
+
+debug:
+	make -f Makeutil utils F="$(F) -g"
+

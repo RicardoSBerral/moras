@@ -1,0 +1,26 @@
+mdtr=CargaDatos("wr.cre", "MultiobjectiveInstance", -1)
+mdts=CargaDatos("wtr.cre", "MultiobjectiveInstance", -1)
+
+SetSplitCriterium(mdtr, "MultipleMSECriterium")
+
+mcart=ConstruyeCART(mdtr,false)
+EvaluaClasificador(mcart, mdts, "MultipleMSEEvaluation")
+EvaluaClasificador(mcart, mdtr, "MultipleMSEEvaluation")
+
+mrf=ConstruyeRandomForest(mdtr,100)
+EvaluaClasificador(mrf, mdts, "MultipleMSEEvaluation")
+EvaluaClasificador(mrf, mdtr, "MultipleMSEEvaluation")
+
+dtr=CargaDatos("wr.cre")
+dts=CargaDatos("wtr.cre")
+
+SetSplitCriterium(dtr, "MSECriterium")
+
+cart=ConstruyeCART(dtr,false)
+EvaluaClasificador(cart, dts, "MSEEvaluation")
+EvaluaClasificador(cart, dtr, "MSEEvaluation")
+
+rf=ConstruyeRandomForest(dtr,100)
+EvaluaClasificador(rf, dts, "MSEEvaluation")
+EvaluaClasificador(rf, dtr, "MSEEvaluation")
+

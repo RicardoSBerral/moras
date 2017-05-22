@@ -1,0 +1,59 @@
+CC = g++
+NOW = $(shell date)
+BFLAGS = $(F) -ansi -pedantic -fpermissive -Wall 
+BFLAGS2 = $(F) -ansi -pedantic -fpermissive -Wall -g 
+LIBGEN = ar
+LBITS := $(shell getconf LONG_BIT)
+ifeq ($(LBITS),64)
+	LIBID="64"
+else
+	LIBID=""
+endif
+CFLAGS = $(BFLAGS) -D VERSION="\"$(NOW)\""
+
+all:
+	make -f Makerun ejemejem_nofortran F="$(F) -O2"
+
+all_sdp:
+	make -f Makerun ejemejem2 F="$(F) -O2"
+
+ejemejem: 
+	$(CC) $(CFLAGS) PruLector.cpp -o cons -Wl,--rpath -Wl,/usr/local/lib/ -I../FES/Extracto/ \
+	-I../NR++/ -L./ -L../FES/Extracto/ -L../R8/SrcAdapted/ -L../csdp/releases/6.0.1/lib$(LIBID)/ \
+	-L ../fann/fann-1.2.0/src/.libs$(LIBID)/ \
+	../NR++/nrr.o genetic.o sort2.o \
+	Matriz.o UtilsGraf.o Utils.o \
+	Lector.o FnsOrdClas.o FnsClasificacion.o FnsAux.o Language.o \
+	Classifier.o Ensemble.o GPTree.o C45Tree.o NNet.o Arcing.o Evaluations.o \
+	SpaceCubes.o -lCART -lc4.5 -ldoublefann -lsdp -llapack -lblas -lgfortran -lm -lpthread -D FLAGS="\"$(BFLAGS) @ $(LBITS)bits\"" -I . -L /usr/lib/atlas-base/atlas/
+	
+ejemejem2: 
+	$(CC) $(CFLAGS) PruLector.cpp -o cons -I../FES/Extracto/ \
+	-I../NR++/ -L./ -L /usr/lib/atlas/ -L../FES/Extracto/ -L../R8/SrcAdapted/ -L../csdp/releases/6.0.1/lib$(LIBID)/ \
+	-L ../fann/fann-1.2.0/src/.libs$(LIBID)/ \
+	../NR++/nrr.o genetic.o sort2.o \
+	Matriz.o UtilsGraf.o Utils.o \
+	Lector.o FnsOrdClas.o FnsClasificacion.o FnsAux.o Language.o \
+	Classifier.o Ensemble.o GPTree.o C45Tree.o NNet.o Arcing.o Evaluations.o \
+	SpaceCubes.o -lCART -lc4.5 -ldoublefann -lsdp -llapack -lblas -lgfortran -lpthread -lm -D FLAGS="\"$(BFLAGS) @ $(LBITS)bits\"" -I . -L /usr/lib/atlas-base/atlas/
+	
+ejemejem_nofortran: 
+	$(CC) $(CFLAGS) PruLector.cpp -o cons -I../FES/Extracto/ \
+	-I../NR++/ -L./ -L /usr/lib/atlas/ -L../FES/Extracto/ -L../R8/SrcAdapted/ -L../csdp/releases/6.0.1/lib$(LIBID)/ \
+	-L ../fann/fann-1.2.0/src/.libs$(LIBID)/ \
+	../NR++/nrr.o genetic.o sort2.o \
+	Matriz.o UtilsGraf.o Utils.o \
+	Lector.o FnsOrdClas.o FnsClasificacion.o FnsAux.o Language.o \
+	Classifier.o Ensemble.o GPTree.o C45Tree.o NNet.o Arcing.o Evaluations.o \
+	SpaceCubes.o -lCART -lc4.5 -ldoublefann -lm -D FLAGS="\"$(BFLAGS) @ $(LBITS)bits\"" -I .
+	
+debug_arcing:
+	$(CC) -ansi -pedantic -Wall -g Arcing.cpp -o ../test/test_arcing -D_DEBUG_ARCING_CPP -I../FES/Extracto/ -L../FES/Extracto/ \
+	-I../R8/SrcAdapted/ -L../R8/SrcAdapted/ Classifier.cpp Ensemble.cpp GPTree.cpp C45Tree.cpp Utils.cpp -lCART -lc4.5 -lm 
+
+debug_ef:
+	make -f Makerun ejemejem F="-g -lefence"
+
+debug:
+	@echo ${fecha}
+	make -f Makerun ejemejem F="$(F) -g"

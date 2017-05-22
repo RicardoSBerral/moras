@@ -1,0 +1,50 @@
+CC = g++
+# CC = icc
+CFLAGS = $(F) -ansi -pedantic -Wall 
+LIBGEN = ar
+
+all:
+	make -f Makeclsf libreria F="$(F) -O2"
+
+libreria: Classifier.o Ensemble.o GPTree.o C45Tree.o NNet.o Arcing.o Evaluations.o
+
+	$(LIBGEN) -r libclsf.a Classifier.o Arcing.o Ensemble.o GPTree.o C45Tree.o Evaluations.o
+
+Classifier.o: Classifier.cpp
+	@echo Compiling... Classifier.cpp
+	$(CC) $(CFLAGS) -c Classifier.cpp -I ../FES/Extracto/ -I .
+
+Ensemble.o: Ensemble.cpp
+	@echo Compiling... Ensemble.cpp
+	$(CC) $(CFLAGS) -c Ensemble.cpp -I ../FES/Extracto/ -I .
+
+GPTree.o: GPTree.cpp
+	@echo Compiling... GPTree.cpp
+	$(CC) $(CFLAGS) -c GPTree.cpp -I ../FES/Extracto/ -I .
+
+C45Tree.o: C45Tree.cpp
+	@echo Compiling... C45Tree.cpp
+	$(CC) $(CFLAGS) -c C45Tree.cpp -I ../FES/Extracto/ -I ../R8/SrcAdapted/ -I .
+
+NNet.o: NNet.cpp
+	@echo Compiling... NNet.cpp
+	$(CC) $(CFLAGS)  -c NNet.cpp -I ../FES/Extracto/ -I ../R8/SrcAdapted/ -I ../fann/fann-1.2.0/src/include -I .
+
+Bagging.o: Bagging.cpp
+	@echo Compiling... Bagging.cpp
+	$(CC) $(CFLAGS) -c Bagging.cpp -I ../FES/Extracto/ -I .
+
+Arcing.o: Arcing.cpp
+	@echo Compiling... Arcing.cpp
+	$(CC) $(CFLAGS) -c Arcing.cpp -I ../FES/Extracto/ -I .
+
+Evaluations.o: Evaluations.cpp
+	@echo Compiling... Evaluations.cpp
+	$(CC) $(CFLAGS) -c Evaluations.cpp -I ../FES/Extracto/ -I .
+
+clean:
+	rm -f *.o *.a
+
+debug:
+	make -f Makeclsf libreria F="$(F) -g"
+

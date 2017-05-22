@@ -1,0 +1,13 @@
+dtr=CargaDatos("w.cre")
+dts=CargaDatos("wt.cre")
+bag=ConstruyeBaggingCART(dtr,11)
+SetPropertyValue(bag, "UseWeights", false)
+
+SeleccionSDP(bag, 0.5, dtr)
+ErrSecClas(bag, dts)
+OrdenaPorEPIC(bag, dtr)
+ErrSecClas(bag, dts)
+OrdenaPorRERegularizadoPorDiversidad(bag,dtr,0.1)
+ErrSecClas(bag, dts)
+OrdenaPorUWA(bag,dtr)
+ErrSecClas(bag, dts)

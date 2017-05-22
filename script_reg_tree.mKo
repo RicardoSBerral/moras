@@ -1,0 +1,10 @@
+dtr=CargaDatos("wr.cre")
+dts=CargaDatos("wtr.cre")
+
+SetSplitCriterium(dtr, "MSECriterium")
+
+cart=ConstruyeCART(dtr,false)
+EvaluaClasificador(cart, dts, "MSEEvaluation")
+EvaluaClasificador(cart, dtr, "MSEEvaluation")
+
+InfoClasificador(cart,4)

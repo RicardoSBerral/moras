@@ -1,0 +1,21 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "tasks": [
+        {
+            "taskName": "Compilar con debug",
+            "isBuildCommand": true,
+            "showOutput": "always",
+            "command": "make",
+            "args": ["runrunrun", "F=-g"],
+            "windows": {
+                "command": "C:\\WINDOWS\\Sysnative\\bash.exe",
+                "args": ["-c", "\"make", "runrunrun", "F=-g"],
+                "options": {
+                    "cwd": "/mnt/d/Dropbox/Documentos/Universidad/TFG/codigo"
+                }
+            }
+        }
+    ]
+}
