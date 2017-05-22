@@ -24,6 +24,10 @@
 *.lai
 *.la
 *.a
+!libdoublefann.a
+!libfann.a
+!libfixedfann.a
+!libfloatfann.a
 *.lib
 
 # Executables
