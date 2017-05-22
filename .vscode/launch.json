@@ -25,8 +25,8 @@
                 "MIMode": "lldb"
             },
             "windows": {
-                "program": "/mnt/d/Dropbox/Documentos/Universidad/TFG/codigo/nucleo/cons",
-                "cwd": "/mnt/d/Dropbox/Documentos/Universidad/TFG/codigo",
+                "program": "/mnt/d/Code/TFG/moras/nucleo/cons",
+                "cwd": "/mnt/d/Code/TFG/moras",
                 "MIMode": "gdb",
                 "setupCommands": [
                     {
