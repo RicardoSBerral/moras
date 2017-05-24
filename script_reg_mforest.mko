@@ -1,0 +1,8 @@
+mdtr=CargaDatos("wr.cre", "MultiobjectiveInstance", -1)
+mdts=CargaDatos("wtr.cre", "MultiobjectiveInstance", -1)
+
+SetSplitCriterium(mdtr, "MultipleMSECriterium")
+
+mrf=ConstruyeRandomForest(mdtr,100)
+EvaluaClasificador(mrf, mdts, "MultipleMSEEvaluation")
+EvaluaClasificador(mrf, mdtr, "MultipleMSEEvaluation")

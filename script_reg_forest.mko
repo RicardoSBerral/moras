@@ -1,0 +1,8 @@
+dtr=CargaDatos("wr.cre")
+dts=CargaDatos("wtr.cre")
+
+SetSplitCriterium(dtr, "MSECriterium")
+
+rf=ConstruyeRandomForest(dtr,100)
+EvaluaClasificador(rf, dts, "MSEEvaluation")
+EvaluaClasificador(rf, dtr, "MSEEvaluation")

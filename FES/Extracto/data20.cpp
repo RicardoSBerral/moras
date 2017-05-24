@@ -636,21 +636,20 @@ inline Instance& MultilabelInstance::operator = (const Instance & other)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
-MultiobjectiveInstance::MultiobjectiveInstance(int nvars) : BasicInstance (nvars - num_multiobjectives)
+MultiobjectiveInstance::MultiobjectiveInstance(int nvars) : BasicInstance (nvars)
 {
   objectives.reserve(num_multiobjectives > 1 ? num_multiobjectives : 1);
 }
-MultiobjectiveInstance::MultiobjectiveInstance(double *vals, int nvars) : BasicInstance (vals, nvars - num_multiobjectives)
+MultiobjectiveInstance::MultiobjectiveInstance(double *vals, int nvars) : BasicInstance (vals, nvars)
 {
   objectives.reserve(num_multiobjectives);
   for(int i = 0; i < num_multiobjectives; i++) {
-    objectives[i] = vals[nvars - num_multiobjectives + i];
+    objectives[i] = vals[nvars + 1 - num_multiobjectives + i];
   }
 }
 inline double MultiobjectiveInstance::operator[](int index)
 {
-  return index < nvars ? BasicInstance::operator[](index) : 
-         GetMultiobjective(index - nvars);
+  return BasicInstance::operator[](index);
 }
 inline void MultiobjectiveInstance::operator()(int index, double valor)
 {
@@ -1054,7 +1053,7 @@ double MultipleMSECriterium::MultipleVariance(std::vector<double> sum, std::vect
   for (int nObjective = 0; nObjective < numberObjectives; nObjective++) {
     variances[nObjective] = sumSquares[nObjective] - pow(sum[nObjective], 2) / numberInstances;
   } // s2R - s1R*s1R/nR
-  return std::accumulate(variances.begin(), variances.end(), 0.0) / numberInstances;
+  return std::accumulate(variances.begin(), variances.end(), 0.0) / numberObjectives;
 }
 
 double MultipleMSECriterium::Initialise(int first, int last, int curSplit, double gamma, int iX, bool FuzzFlag)
@@ -1062,10 +1061,10 @@ double MultipleMSECriterium::Initialise(int first, int last, int curSplit, doubl
   int numberObjectives = MultiobjectiveInstance::GetNumMultiobjectives();
   
   nL = nR = R[0] = R[1] = 0.0;
-  s1L.assign(numberObjectives, 0.0);
-  s2L.assign(numberObjectives, 0.0);
-  s1R.assign(numberObjectives, 0.0);
-  s2R.assign(numberObjectives, 0.0);
+  s1L = std::vector<double>(numberObjectives, 0.0);
+  s2L = std::vector<double>(numberObjectives, 0.0);
+  s1R = std::vector<double>(numberObjectives, 0.0);
+  s2R = std::vector<double>(numberObjectives, 0.0);
 
   // Initialise
   for(int i = first; i <= last; i++) {
