@@ -1,0 +1,11 @@
+dtr=CargaDatos("wr_cambiado.cre")
+dts=CargaDatos("wtr_cambiado.cre")
+
+CambiaColumnaDependiente(dtr, 20)
+CambiaColumnaDependiente(dts, 20)
+
+SetSplitCriterium(dtr, "MSECriterium")
+
+rf=ConstruyeRandomForest(dtr,100)
+EvaluaClasificador(rf, dts, "MSEEvaluation")
+EvaluaClasificador(rf, dtr, "MSEEvaluation")

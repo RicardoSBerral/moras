@@ -92,6 +92,7 @@ void DarDeAltaFnsClasificacion()
 {
   LoadClassifier::DarDeAlta();
   LoadDataset::DarDeAlta();
+  ChangeDependentColumn::DarDeAlta();
   GenerateWrongLabels::DarDeAlta();
   Corrected::DarDeAlta();
   LoadLabels::DarDeAlta();
@@ -282,7 +283,7 @@ Mandato* LoadDataset::Ejecutar()
     cout << "Instance type is " << Param(1)->ComoCadena();
   }
 
-  int attribute_index = -1;
+int attribute_index = -1;
   if (NumParamsAsignados() > 2) {
     int val = Param(2)->ComoEntero();
     if ( val < 0 ) {
@@ -306,6 +307,43 @@ Mandato* LoadDataset::Ejecutar()
   }
 
   if (instanceBuilder) delete instanceBuilder;
+
+  return this;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+ChangeDependentColumn::~ChangeDependentColumn()
+{
+  if(nd) delete nd;
+}
+//---------------------------------------------------------------------------
+void ChangeDependentColumn::CreateParams()
+{
+  Parametros.push_back(new Parametro(false, TipoData::TData(), "Ejemplos",
+                             "Nombre de la base de datos con los ejemplos"));
+  
+  Parametro *p = new ParametroEntero();
+  p->PonPropiedades(false, 0, "Column index for dependent variable",
+                              "starts in 0");
+  Parametros.push_back(p);
+
+}
+//---------------------------------------------------------------------------
+void ChangeDependentColumn::DarDeAlta()
+{
+  ifns().AnadirInterfazFuncion(new ChangeDependentColumn(), "File");
+}
+//---------------------------------------------------------------------------
+Mandato* ChangeDependentColumn::Ejecutar()
+{
+  Param(0)->Ejecutar();
+  Param(1)->Ejecutar();
+
+  Data* nd = (Data*)Param(0)->ComoDatos();
+  int nueva = Param(1)->ComoEntero();
+
+  nd->ChangeDependentColumn(nueva);
 
   return this;
 }

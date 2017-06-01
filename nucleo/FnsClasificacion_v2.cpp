@@ -88,6 +88,7 @@ void DarDeAltaFnsClasificacion()
 {
   CargaClasificador::DarDeAlta();
   CargaDatos::DarDeAlta();
+  CambiaColumnaDependiente::DarDeAlta();
   FiltraDatos::DarDeAlta();
   Clasificar::DarDeAlta();
   ClasErr::DarDeAlta();
@@ -239,6 +240,43 @@ Mandato* CargaDatos::Ejecutar()
 
   nd = Data::DataFromFile((char*)Param(0)->ComoCadena().c_str());
   nd->SetNTrain(nd->GetNTotal());
+
+  return this;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+CambiaColumnaDependiente::~CambiaColumnaDependiente()
+{
+  if(nd) delete nd;
+}
+//---------------------------------------------------------------------------
+void CambiaColumnaDependiente::CreateParams()
+{
+  Parametros.push_back(new Parametro(false, TipoData::TData(), "Ejemplos",
+                             "Nombre de la base de datos con los ejemplos"));
+  
+  Parametro *p = new ParametroEntero();
+  p->PonPropiedades(false, 0, "Column index for dependent variable",
+                              "starts in 0");
+  Parametros.push_back(p);
+
+}
+//---------------------------------------------------------------------------
+void CambiaColumnaDependiente::DarDeAlta()
+{
+  ifns().AnadirInterfazFuncion(new CambiaColumnaDependiente(), "File");
+}
+//---------------------------------------------------------------------------
+Mandato* CambiaColumnaDependiente::Ejecutar()
+{
+  Param(0)->Ejecutar();
+  Param(1)->Ejecutar();
+
+  Data* nd = (Data*)Param(0)->ComoDatos();
+  int nueva = Param(1)->ComoEntero();
+
+  nd->ChangeDependentColumn(nueva);
 
   return this;
 }

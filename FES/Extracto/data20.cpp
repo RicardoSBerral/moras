@@ -3643,6 +3643,14 @@ void Data::PermuteAttributeValues(int iatt)
     instances[elem](iatt, hold);
   }
 }
+void Data::ChangeDependentColumn(int newDependenColumnIndex)
+{
+  for(int i = 0; i < NTotal; i++) {
+    double hold = instances[i][newDependenColumnIndex];
+    instances[i](newDependenColumnIndex, instances[i][Nvar-1]);
+    instances[i](Nvar-1, hold);
+  }
+}
 void Data::Scramble(int begin,int end)
 {
 

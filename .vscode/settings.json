@@ -17,6 +17,7 @@
         "typeinfo": "cpp",
         "*.i": "cpp",
         "*.tcc": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "iostream": "cpp"
     }
 }

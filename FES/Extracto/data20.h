@@ -547,6 +547,7 @@ protected:
     int FindFirstTest(int cv, int first, int last);
     void Scramble(int begin, int end);
     void PermuteAttributeValues(int iatt);
+    void ChangeDependentColumn(int newDependenColumnIndex);
 
     // Building tree
     double FindMembership(const Node* n);

@@ -225,6 +225,36 @@ class LoadDataset : public IntefazFuncion, Funcion
 
 };
 //---------------------------------------------------------------------------
+class ChangeDependentColumn : public IntefazFuncion, Funcion
+{
+   Data *nd;
+
+  public:
+    ChangeDependentColumn(std::vector<Mandato *> mands) : Funcion(mands) 
+                                                   { nd = 0; CreateParams();}
+    ChangeDependentColumn() : Funcion() { nd = 0; CreateParams();}
+    virtual ~ChangeDependentColumn();
+
+    void CreateParams();
+    virtual unsigned NumParams(){return 2;}
+    virtual Funcion* CrearFuncion() {return new ChangeDependentColumn();}
+    virtual std::string NombreFuncion() {return StringRepository::GetString("ChangeDependentColumn");}
+
+    virtual Mandato* Ejecutar();
+
+    virtual Tipo* DameTipo(){return TipoData::TData();}
+    virtual bool EsDatos(){return true;}
+
+    virtual std::string ComoCadena() {return "";}
+    virtual double ComoNumero(){return 0;}
+    virtual int ComoEntero(){return (long int)nd;}
+    virtual bool ComoBooleano(){return nd;}
+    virtual void* ComoDatos(){return nd;}
+
+    static void DarDeAlta();
+
+};
+//---------------------------------------------------------------------------
 class GenerateWrongLabels : public IntefazFuncion, Funcion
 {
    Matriz *mat;
