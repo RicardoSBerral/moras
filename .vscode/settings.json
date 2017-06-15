@@ -18,6 +18,20 @@
         "*.i": "cpp",
         "*.tcc": "cpp",
         "system_error": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "bitset": "cpp",
+        "cmath": "cpp",
+        "fstream": "cpp",
+        "functional": "cpp",
+        "iomanip": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp"
     }
 }

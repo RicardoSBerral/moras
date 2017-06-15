@@ -32,6 +32,7 @@ StringRepositoryEnglish::StringRepositoryEnglish():StringRepository()
    strings["LoadClassifier"] 	= "LoadClassifier";
    strings["LoadDataset"] 	= "LoadDataset";
    strings["ChangeDependentColumn"] 	= "ChangeDependentColumn";
+   strings["CopyDependentColumn"] 	= "CopyDependentColumn";
    strings["GenerateWrongLabels"] 	= "GenerateWrongLabels";
    strings["Corrected"] 	= "Corrected";
    strings["LoadLabels"] 	= "LoadLabels";
@@ -83,6 +84,7 @@ StringRepositorySpanish::StringRepositorySpanish():StringRepository()
    strings["LoadClassifier"] 	= "CargaClasificador";
    strings["LoadDataset"] 	= "CargaDatos";
    strings["ChangeDependentColumn"] 	= "CambiaColumnaDependiente";
+   strings["CopyDependentColumn"] 	= "CopiaColumnaDependiente";
    strings["GenerateWrongLabels"] 	= "GeneraEtiquetasErroneas";
    strings["Corrected"] 	= "Corregidos";
    strings["LoadLabels"] 	= "CargaEtiquetas";

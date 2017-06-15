@@ -198,6 +198,23 @@ inline Instance& BasicInstance::operator = (const Instance & other)
 
   return *this;
 }
+void BasicInstance::ChangeDependentColumn(int newDependentColumnIndex) {
+  double hold = (*this)[newDependentColumnIndex];
+  (*this)(newDependentColumnIndex, (*this)[nvars]);
+  (*this)(nvars, hold);
+}
+void BasicInstance::CopyDependentColumn() {
+  // We construct the new data, same as the old one, except for the duplicated column
+  double* newData = new double[nvars + 4];
+  std::copy(data, data + nvars + 1, newData);
+  newData[nvars + 1] = newData[nvars];
+  std::copy(data + nvars + 1, data + nvars + 3, newData + nvars + 2);
+  
+  // Substitution of the relevant fields
+  delete [] data;
+  data = newData;
+  nvars += 1;
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -270,6 +287,12 @@ inline Instance& UInt8Instance::operator = (const Instance & other)
   Weight            = pother->Weight;
 
   return *this;
+}
+void UInt8Instance::ChangeDependentColumn(int newDependentColumnIndex) {
+  throw std::logic_error("UInt8Instance::ChangeDependentColumn is not implemented yet.");
+}
+void UInt8Instance::CopyDependentColumn() {
+  throw std::logic_error("UInt8Instance::CopyDependentColumn is not implemented yet.");
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -344,6 +367,12 @@ inline Instance& ShortInstance::operator = (const Instance & other)
 
   return *this;
 }
+void ShortInstance::ChangeDependentColumn(int newDependentColumnIndex) {
+  throw std::logic_error("UInt8Instance::ShortInstance is not implemented yet.");
+}
+void ShortInstance::CopyDependentColumn() {
+  throw std::logic_error("ShortInstance::CopyDependentColumn is not implemented yet.");
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -417,6 +446,12 @@ inline Instance& Int32Instance::operator = (const Instance & other)
 
   return *this;
 }
+void Int32Instance::ChangeDependentColumn(int newDependentColumnIndex) {
+  throw std::logic_error("Int32Instance::ShortInstance is not implemented yet.");
+}
+void Int32Instance::CopyDependentColumn() {
+  throw std::logic_error("Int32Instance::CopyDependentColumn is not implemented yet.");
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -489,6 +524,12 @@ inline Instance& FloatInstance::operator = (const Instance & other)
   Weight            = pother->Weight;
 
   return *this;
+}
+void FloatInstance::ChangeDependentColumn(int newDependentColumnIndex) {
+  throw std::logic_error("FloatInstance::ShortInstance is not implemented yet.");
+}
+void FloatInstance::CopyDependentColumn() {
+  throw std::logic_error("FloatInstance::CopyDependentColumn is not implemented yet.");
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -591,6 +632,12 @@ inline Instance& ComboInstance::operator = (const Instance & other)
 
   return *this;
 }
+void ComboInstance::ChangeDependentColumn(int newDependentColumnIndex) {
+  throw std::logic_error("ComboInstance::ShortInstance is not implemented yet.");
+}
+void ComboInstance::CopyDependentColumn() {
+  throw std::logic_error("ComboInstance::CopyDependentColumn is not implemented yet.");
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -632,6 +679,12 @@ inline Instance& MultilabelInstance::operator = (const Instance & other)
 
   return *this;
 }
+void MultilabelInstance::ChangeDependentColumn(int newDependentColumnIndex) {
+  throw std::logic_error("MultilabelInstance::ShortInstance is not implemented yet.");
+}
+void MultilabelInstance::CopyDependentColumn() {
+  throw std::logic_error("MultilabelInstance::CopyDependentColumn is not implemented yet.");
+}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -644,7 +697,7 @@ MultiobjectiveInstance::MultiobjectiveInstance(double *vals, int nvars) : BasicI
 {
   objectives.reserve(num_multiobjectives);
   for(int i = 0; i < num_multiobjectives; i++) {
-    objectives[i] = vals[nvars + 1 - num_multiobjectives + i];
+    objectives[i] = vals[i + GetNumIndependentVars()];
   }
 }
 inline double MultiobjectiveInstance::operator[](int index)
@@ -653,8 +706,10 @@ inline double MultiobjectiveInstance::operator[](int index)
 }
 inline void MultiobjectiveInstance::operator()(int index, double valor)
 {
-  if (index < nvars) BasicInstance::operator()(index, valor);
-  else SetMultiobjective(index - nvars, valor);
+  BasicInstance::operator()(index, valor);
+  if (index >= GetNumIndependentVars()) {
+    SetMultiobjective(index - GetNumIndependentVars(), valor);
+  }
 }
 MultiobjectiveInstance::operator std::vector<double>()
 {
@@ -673,6 +728,28 @@ inline Instance& MultiobjectiveInstance::operator = (const Instance & other)
   this->objectives = pother->objectives;
 
   return *this;
+}
+void MultiobjectiveInstance::ChangeDependentColumn(int newDependentColumnIndex) {
+
+  // First, we call the super method
+  BasicInstance::ChangeDependentColumn(newDependentColumnIndex);
+
+  // If the new dependent column is an objective...
+  if (newDependentColumnIndex >= GetNumIndependentVars()) {
+    objectives[newDependentColumnIndex-GetNumIndependentVars()] = (*this)[newDependentColumnIndex];
+  }
+
+  // Either dependent or independent...
+  objectives[num_multiobjectives-1] = (*this)[nvars-1];
+}
+void MultiobjectiveInstance::CopyDependentColumn() {
+
+  // First, we call the super method
+  BasicInstance::CopyDependentColumn();
+  
+  // Insert the new objective
+  // We assume the number of objectives has already been updated
+  objectives.resize(num_multiobjectives, objectives[num_multiobjectives-2]);
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -2088,34 +2165,74 @@ void NomData::WriteNode(Node* n, char *buf, int K)
 //  if(!n->child || (n->child->K <= K && K>=0)){
   if (n->IsLeaf(K)) {
     if (n->parent && n->parent->child == n) {
-      sprintf(buf,"%s is ", VarNames[Nvar-1].c_str());
-      if (DepVarType==NOM) sprintf(buf,"%s ", NomTerms[Nnom].at(n->iClass).c_str());
-      else                 sprintf(buf,"%f ", n->fClass);
-      sprintf(buf,"(K=%d) (%g", n->K, n->d ? n->d->Rleaf : 0);
-      sprintf(buf,"(%g)/", n->d ? n->d->RsubTree : 0);
-      sprintf(buf,"%d) ", n->last - n->first + 1);
-      sprintf(buf,"(a=%g) T=%d\n", n->alpha, n->T);
+      if (MultiobjectiveInstance::GetNumMultiobjectives() == -1) {
+        sprintf(buf,"%s is ", VarNames[Nvar-1].c_str());
+        if (DepVarType==NOM) {
+          sprintf(buf+strlen(buf),"%s ", NomTerms[Nnom].at(n->iClass).c_str());
+        } else {
+          sprintf(buf+strlen(buf),"%f ", n->fClass);
+        }
+      } else {
+        if (DepVarType==NOM) {
+          throw std::invalid_argument("Can't describe multi-objective nominal nodes");
+        } else {
+          int first_objective = Nvar - MultiobjectiveInstance::GetNumMultiobjectives();
+          for (int i=first_objective; i<Nvar; i++) {
+            sprintf(buf+strlen(buf),"%s is ", VarNames[i].c_str());
+            sprintf(buf+strlen(buf),"%f ", n->NodePop[i-first_objective]);
+            if (i != Nvar - 1) {
+              sprintf(buf+strlen(buf),"and ");
+            }
+          }
+        }
+      }
+      sprintf(buf+strlen(buf),"(K=%d) (%g", n->K, n->d ? n->d->Rleaf : 0);
+      sprintf(buf+strlen(buf),"(%g)/", n->d ? n->d->RsubTree : 0);
+      sprintf(buf+strlen(buf),"%d) ", n->last - n->first + 1);
+      sprintf(buf+strlen(buf),"(a=%g) T=%d\n", n->alpha, n->T);
     }
     else {
-      if (DepVarType==NOM) { 
-        sprintf(buf,"ELSE var %s is %s (K=%d) (%g(%g)/%d) (a=%g) T=%d\n",
-                         VarNames[Nvar-1].c_str(),
-                         NomTerms[Nnom].at(n->iClass).c_str(), 
-                         n->K, 
-                         n->d ? n->d->Rleaf : 0, 
-                         n->d ? n->d->RsubTree : 0, 
-                         (n->last - n->first + 1),
-                         n->alpha, n->T);
-      }
-      else {
-        sprintf(buf,"ELSE var %s is %f (K=%d) (%g(%g)/%d) (a=%g) T=%d\n",
-                         VarNames[Nvar-1].c_str(),
-                         n->fClass, 
-                         n->K, 
-                         n->d ? n->d->Rleaf : 0, 
-                         n->d ? n->d->RsubTree : 0, 
-                         (n->last - n->first + 1),
-                         n->alpha, n->T);
+      if (MultiobjectiveInstance::GetNumMultiobjectives() == -1) {
+        if (DepVarType==NOM) {
+          sprintf(buf,"ELSE var %s is %s (K=%d) (%g(%g)/%d) (a=%g) T=%d\n",
+                          VarNames[Nvar-1].c_str(),
+                          NomTerms[Nnom].at(n->iClass).c_str(), 
+                          n->K, 
+                          n->d ? n->d->Rleaf : 0, 
+                          n->d ? n->d->RsubTree : 0, 
+                          (n->last - n->first + 1),
+                          n->alpha, n->T);
+        } else {
+          sprintf(buf,"ELSE var %s is %f (K=%d) (%g(%g)/%d) (a=%g) T=%d\n",
+                          VarNames[Nvar-1].c_str(),
+                          n->fClass, 
+                          n->K, 
+                          n->d ? n->d->Rleaf : 0, 
+                          n->d ? n->d->RsubTree : 0, 
+                          (n->last - n->first + 1),
+                          n->alpha, n->T);
+        }
+      } else {
+        if (DepVarType==NOM) {
+          throw std::invalid_argument("Can't describe multi-objective nominal nodes");
+        } else {
+          int first_objective = Nvar - MultiobjectiveInstance::GetNumMultiobjectives();
+          sprintf(buf,"ELSE ");
+          for (int i=Nvar-MultiobjectiveInstance::GetNumMultiobjectives(); i<Nvar; i++) {
+            sprintf(buf+strlen(buf),"var %s is %f ",
+                          VarNames[i].c_str(),
+                          n->NodePop[i-first_objective]);
+            if (i != Nvar - 1) {
+              sprintf(buf+strlen(buf),"and ");
+            }
+          }
+          sprintf(buf+strlen(buf),"(K=%d) (%g(%g)/%d) (a=%g) T=%d\n",
+                      n->K, 
+                      n->d ? n->d->Rleaf : 0, 
+                      n->d ? n->d->RsubTree : 0, 
+                      (n->last - n->first + 1),
+                      n->alpha, n->T);
+        }
       }
     }
   } 
@@ -3155,9 +3272,12 @@ void Data::SetValueVar(int i, int j, double value)
 }
 void Data::SetDefaultNames(int nvar)
 {
+  int numberObjectives = MultiobjectiveInstance::GetNumMultiobjectives();
+  bool multiObjective = numberObjectives > 0;
+
   //Variables "horizontales" (o las que tienen que ver con atributos...)
   Nvar = nvar;
-  Nord = Nvar-1;
+  Nord = multiObjective ? Nvar-numberObjectives : Nvar-1;
   Nfuzz=Nnom=0;
   Nordfuzz = Nord+Nfuzz;
   NVarsOrdSplit = Nord;
@@ -3411,6 +3531,8 @@ void Data::GetNames(FILE *f)
   int tipo, iNom;
   char linea[1024];
   char varname[1024];
+  int numberObjectives = MultiobjectiveInstance::GetNumMultiobjectives();
+  bool multiObjective = numberObjectives > 0;
   
   fscanf(f, "%d", &Nvar);
 //  init(NTotal?NTotal:1, Nvar);
@@ -3460,14 +3582,16 @@ void Data::GetNames(FILE *f)
 
   //Variable dependiente
   DepVarType = OriginalVarType[Nvar-1];
-  if (DepVarType==NOM) Nnom--;
+  if (DepVarType==NOM) {
+    Nnom -= multiObjective ? numberObjectives : 1;
+  }
   else if (DepVarType==ORD) {
-    Nord--;
+    Nord -= multiObjective ? numberObjectives : 1;
     fgets(linea, 1024, f);
   }
 
-  if (Nvar != Nord+Nfuzz+Nnom+1) {
-    Nvar = Nord + Nfuzz + Nnom + 1;
+  if (Nvar != Nord+Nfuzz+Nnom+(multiObjective ? numberObjectives : 1)) {
+    Nvar = Nord + Nfuzz + Nnom + (multiObjective ? numberObjectives : 1);
   }
   Nordfuzz = Nord+Nfuzz;
   NVarsOrdSplit = Nord;
@@ -3643,13 +3767,36 @@ void Data::PermuteAttributeValues(int iatt)
     instances[elem](iatt, hold);
   }
 }
-void Data::ChangeDependentColumn(int newDependenColumnIndex)
+void Data::ChangeDependentColumn(int newDependentColumnIndex)
 {
   for(int i = 0; i < NTotal; i++) {
-    double hold = instances[i][newDependenColumnIndex];
-    instances[i](newDependenColumnIndex, instances[i][Nvar-1]);
-    instances[i](Nvar-1, hold);
+    instances[i].ChangeDependentColumn(newDependentColumnIndex);
   }
+}
+void Data::CopyDependentColumn(int new_num_multi)
+{
+  // Multi-objetivo aumentado
+  if (new_num_multi > 0) {
+    if (MultilabelInstance::GetNumMultilabels() > 0) {
+      MultilabelInstance::SetNumMultilabels(new_num_multi);
+    }
+    if (MultiobjectiveInstance::GetNumMultiobjectives() > 0) {
+      MultiobjectiveInstance::SetNumMultiobjectives(new_num_multi);
+    }
+  }
+  
+  for(int i = 0; i < NTotal; i++) {
+    instances[i].CopyDependentColumn();
+  }
+
+  // Nuevo nombre de clase
+  string* newArray = new string[Nvar + 1];
+  std::copy(VarNames, VarNames + Nvar, newArray);
+  newArray[Nvar] = VarNames[Nvar-1] + "_b";
+  delete []VarNames;
+  VarNames = newArray;
+
+  this->Nvar += 1;
 }
 void Data::Scramble(int begin,int end)
 {

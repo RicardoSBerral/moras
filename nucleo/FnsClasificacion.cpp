@@ -93,6 +93,7 @@ void DarDeAltaFnsClasificacion()
   LoadClassifier::DarDeAlta();
   LoadDataset::DarDeAlta();
   ChangeDependentColumn::DarDeAlta();
+  CopyDependentColumn::DarDeAlta();
   GenerateWrongLabels::DarDeAlta();
   Corrected::DarDeAlta();
   LoadLabels::DarDeAlta();
@@ -253,12 +254,12 @@ void LoadDataset::CreateParams()
   CadenasValidas.push_back("MultiobjectiveInstance");
   Parametro *p2 = new ParametroCadena(&CadenasValidas);
   //p2->PonPropiedades(false, 0, "Tipo de dato donde cargar las instancias", "Por omision es double");
-  p2->PonPropiedades(false, 0, "Instance data type, BasicInstance by default (double)", 
+  p2->PonPropiedades(true, 0, "Instance data type, BasicInstance by default (double)", 
                      "This field allows us to use less memory by using less precision");
   Parametros.push_back(p2);
 
   Parametro *p = new ParametroEntero();
-  p->PonPropiedades(false, 0, "Column index with the multi-instance information (for MI datasets)"
+  p->PonPropiedades(true, 0, "Column index with the multi-instance information (for MI datasets)"
                               "If negative, number of classes for multi-label datasets",
       "starts in 0");
   Parametros.push_back(p);
@@ -324,7 +325,7 @@ void ChangeDependentColumn::CreateParams()
                              "Nombre de la base de datos con los ejemplos"));
   
   Parametro *p = new ParametroEntero();
-  p->PonPropiedades(false, 0, "Column index for dependent variable",
+  p->PonPropiedades(true, 0, "Column index for dependent variable",
                               "starts in 0");
   Parametros.push_back(p);
 
@@ -344,6 +345,43 @@ Mandato* ChangeDependentColumn::Ejecutar()
   int nueva = Param(1)->ComoEntero();
 
   nd->ChangeDependentColumn(nueva);
+
+  return this;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+CopyDependentColumn::~CopyDependentColumn()
+{
+  if(nd) delete nd;
+}
+//---------------------------------------------------------------------------
+void CopyDependentColumn::CreateParams()
+{
+  Parametros.push_back(new Parametro(false, TipoData::TData(), "Ejemplos",
+                             "Nombre de la base de datos con los ejemplos"));
+  
+  Parametro *p = new ParametroEntero();
+  p->PonPropiedades(true, 0, "New number of objective variables", "Starts at 1");
+  Parametros.push_back(p);
+
+}
+//---------------------------------------------------------------------------
+void CopyDependentColumn::DarDeAlta()
+{
+  ifns().AnadirInterfazFuncion(new CopyDependentColumn(), "File");
+}
+//---------------------------------------------------------------------------
+Mandato* CopyDependentColumn::Ejecutar()
+{
+  Param(0)->Ejecutar();
+
+  Data* nd = (Data*)Param(0)->ComoDatos();
+  if (NumParamsAsignados() == 1) {
+    nd->CopyDependentColumn();
+  } else {
+    nd->CopyDependentColumn(Param(1)->ComoEntero());
+  }
 
   return this;
 }

@@ -89,6 +89,7 @@ void DarDeAltaFnsClasificacion()
   CargaClasificador::DarDeAlta();
   CargaDatos::DarDeAlta();
   CambiaColumnaDependiente::DarDeAlta();
+  CopiarColumnaDependiente::DarDeAlta();
   FiltraDatos::DarDeAlta();
   Clasificar::DarDeAlta();
   ClasErr::DarDeAlta();
@@ -277,6 +278,35 @@ Mandato* CambiaColumnaDependiente::Ejecutar()
   int nueva = Param(1)->ComoEntero();
 
   nd->ChangeDependentColumn(nueva);
+
+  return this;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+CopiarColumnaDependiente::~CopiarColumnaDependiente()
+{
+  if(nd) delete nd;
+}
+//---------------------------------------------------------------------------
+void CopiarColumnaDependiente::CreateParams()
+{
+  Parametros.push_back(new Parametro(false, TipoData::TData(), "Ejemplos",
+                             "Nombre de la base de datos con los ejemplos"));
+
+}
+//---------------------------------------------------------------------------
+void CopiarColumnaDependiente::DarDeAlta()
+{
+  ifns().AnadirInterfazFuncion(new CopiarColumnaDependiente(), "File");
+}
+//---------------------------------------------------------------------------
+Mandato* CopiarColumnaDependiente::Ejecutar()
+{
+  Param(0)->Ejecutar();
+
+  Data* nd = (Data*)Param(0)->ComoDatos();
+  nd->CopiarColumnaDependiente();
 
   return this;
 }

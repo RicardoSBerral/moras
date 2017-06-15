@@ -117,6 +117,7 @@ MSEEvaluation::MSEEvaluation(Classifier *clf, Data *data, string params) : Evalu
   int Nvar = data->GetNumVar();
   for (int i = 0 ; i < data->GetNTotal(); i++) {
     double d = clf->Average(i) - data->GetInstance(i)[Nvar-1];
+    // printf("Average[%d] = %f, Nvar-1 = %f, d = %f\n", i, clf->Average(i), data->GetInstance(i)[Nvar-1], d);
     rms += data->GetInstance(i).GetWeight() * d * d;
     ww += data->GetInstance(i).GetWeight();
   }
@@ -163,6 +164,7 @@ MultipleMSEEvaluation::MultipleMSEEvaluation(Classifier *clf, Data *data, string
     MultiobjectiveInstance& instance = dynamic_cast<MultiobjectiveInstance&> (data->GetInstance(i));
     for (int nObjective = 0; nObjective < numberObjectives; nObjective++) {
       double d = averages[nObjective] - instance.GetMultiobjective(nObjective);
+      // printf("Average[%d][%d] = %f, obj = %f, d = %f\n", i, nObjective, averages[nObjective], instance.GetMultiobjective(nObjective), d);
       rms += instance.GetWeight() * d * d / numberObjectives;
       ww += instance.GetWeight() / numberObjectives;
     }

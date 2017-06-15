@@ -255,6 +255,36 @@ class ChangeDependentColumn : public IntefazFuncion, Funcion
 
 };
 //---------------------------------------------------------------------------
+class CopyDependentColumn : public IntefazFuncion, Funcion
+{
+   Data *nd;
+
+  public:
+    CopyDependentColumn(std::vector<Mandato *> mands) : Funcion(mands) 
+                                                   { nd = 0; CreateParams();}
+    CopyDependentColumn() : Funcion() { nd = 0; CreateParams();}
+    virtual ~CopyDependentColumn();
+
+    void CreateParams();
+    virtual unsigned NumParams(){return 2;}
+    virtual Funcion* CrearFuncion() {return new CopyDependentColumn();}
+    virtual std::string NombreFuncion() {return StringRepository::GetString("CopyDependentColumn");}
+
+    virtual Mandato* Ejecutar();
+
+    virtual Tipo* DameTipo(){return TipoData::TData();}
+    virtual bool EsDatos(){return true;}
+
+    virtual std::string ComoCadena() {return "";}
+    virtual double ComoNumero(){return 0;}
+    virtual int ComoEntero(){return (long int)nd;}
+    virtual bool ComoBooleano(){return nd;}
+    virtual void* ComoDatos(){return nd;}
+
+    static void DarDeAlta();
+
+};
+//---------------------------------------------------------------------------
 class GenerateWrongLabels : public IntefazFuncion, Funcion
 {
    Matriz *mat;

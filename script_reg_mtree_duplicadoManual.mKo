@@ -1,0 +1,10 @@
+mdtr=CargaDatos("wr_duplicado.cre", "MultiobjectiveInstance", -2)
+mdts=CargaDatos("wtr_duplicado.cre", "MultiobjectiveInstance", -2)
+
+SetSplitCriterium(mdtr, "MultipleMSECriterium")
+
+mcart=ConstruyeCART(mdtr,false)
+EvaluaClasificador(mcart, mdts, "MultipleMSEEvaluation")
+EvaluaClasificador(mcart, mdtr, "MultipleMSEEvaluation")
+
+InfoClasificador(mcart,4)

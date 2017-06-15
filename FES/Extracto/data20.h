@@ -66,6 +66,8 @@ class Instance
     virtual inline int GetDependentVariable() {return GetClass();}
     virtual inline int GetClass() {return Class;}
     virtual inline void SetClass(int cls) {Class = cls;}
+    virtual void ChangeDependentColumn(int newDependenColumnIndex) = 0;
+    virtual void CopyDependentColumn() = 0;
 
     inline int GetIniPos(){return IniPos;}
     inline int GetGroup() {return Group;}
@@ -99,6 +101,9 @@ class BasicInstance : public Instance
 
     virtual inline double GetWorkingVar(int i) {return data[nvars+1+i];}
     virtual inline void SetWorkingVar(int i, double value) {data[nvars+1+i] = value;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 class UInt8Instance : public Instance  // Tipico para hacer con templates....
 {
@@ -123,6 +128,9 @@ class UInt8Instance : public Instance  // Tipico para hacer con templates....
 
     virtual inline double GetWorkingVar(int i) {return wv[i];}
     virtual inline void SetWorkingVar(int i, double value) {wv[i] = value;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 class ShortInstance : public Instance
 {
@@ -147,6 +155,9 @@ class ShortInstance : public Instance
 
     virtual inline double GetWorkingVar(int i) {return wv[i];}
     virtual inline void SetWorkingVar(int i, double value) {wv[i] = value;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 class Int32Instance : public Instance
 {
@@ -171,6 +182,9 @@ class Int32Instance : public Instance
 
     virtual inline double GetWorkingVar(int i) {return wv[i];}
     virtual inline void SetWorkingVar(int i, double value) {wv[i] = value;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 class FloatInstance : public Instance
 {
@@ -195,6 +209,9 @@ class FloatInstance : public Instance
 
     virtual inline double GetWorkingVar(int i) {return wv[i];}
     virtual inline void SetWorkingVar(int i, double value) {wv[i] = value;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 class ComboInstance : public Instance
 {
@@ -220,6 +237,9 @@ class ComboInstance : public Instance
 
     virtual inline double GetWorkingVar(int i) {return wv[i];}
     virtual inline void SetWorkingVar(int i, double value) {wv[i] = value;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 
 class MultilabelInstance : public BasicInstance
@@ -252,6 +272,9 @@ class MultilabelInstance : public BasicInstance
   public:
     bool GetMultilabel(int j) { return labels[j];}
     void SetMultilabel(int j, bool valor) {labels[j] = valor;}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 
 class MultiobjectiveInstance : public BasicInstance
@@ -274,6 +297,7 @@ class MultiobjectiveInstance : public BasicInstance
     inline virtual Instance& operator = (const Instance & other);
     virtual operator std::vector<double>();
     virtual inline int GetClass() {return objective_index < 0 ? Class : GetMultiobjective(objective_index);}
+    inline int GetNumIndependentVars() {return nvars - num_multiobjectives + 1;}
 
   public:
     static int GetNumMultiobjectives() { return num_multiobjectives; }
@@ -284,6 +308,9 @@ class MultiobjectiveInstance : public BasicInstance
   public:
     double GetMultiobjective(int j) { return objectives[j];}
     void SetMultiobjective(int j, double valor) {objectives.insert(objectives.begin() + j, valor);}
+
+    virtual void ChangeDependentColumn(int newDependenColumnIndex);
+    virtual void CopyDependentColumn();
 };
 
 class Instances
@@ -548,6 +575,7 @@ protected:
     void Scramble(int begin, int end);
     void PermuteAttributeValues(int iatt);
     void ChangeDependentColumn(int newDependenColumnIndex);
+    void CopyDependentColumn(int new_num_multi = -1);
 
     // Building tree
     double FindMembership(const Node* n);

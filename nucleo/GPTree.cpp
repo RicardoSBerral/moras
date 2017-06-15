@@ -242,7 +242,8 @@ std::vector<double> DecisionTree::MultipleAverage(int ElementIndex)
 {
   data->Classify(ElementIndex, 0, tree->GetRoot(), GetK(), &lastClassifyingNode);
   double* array = lastClassifyingNode->NodePop;
-  std::vector<double> ret(array, array + sizeof array / sizeof array[0]);
+  std::vector<double> ret;
+  ret.assign(array, array + MultiobjectiveInstance::GetNumMultiobjectives());
   return ret;
 }
 //---------------------------------------------------------------------------
