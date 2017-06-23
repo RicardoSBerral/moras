@@ -53,6 +53,7 @@ class Classifier
 
     virtual std::vector<double> UnnormalizedDistribution(int ElementIndex);
     virtual double Average(int ElementIndex) {return Classify(ElementIndex);}
+    virtual double Average(int ElementIndex, int AttributeIndex) {throw std::logic_error("Function not yet implemented");}
     virtual std::vector<double> MultipleAverage(int ElementIndex)
     {
       throw std::runtime_error("Multi-objetivo no permitido");

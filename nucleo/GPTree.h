@@ -56,6 +56,7 @@ class DecisionTree : public Classifier
     virtual double Error(int first, int last);
     virtual int Classify(int ElementIndex);
     virtual double Average(int ElementIndex);
+    virtual double Average(int ElementIndex, int AttributeIndex);
     virtual std::vector<double> MultipleAverage(int ElementIndex);
     virtual std::vector<double> UnnormalizedDistribution(int ElementIndex);
     virtual std::string Info(int value=0);

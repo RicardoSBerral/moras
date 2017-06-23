@@ -161,6 +161,20 @@ double Ensemble::Average(int ElementIndex)
 
   return suma/total;
 }
+double Ensemble::Average(int ElementIndex, int AttributeIndex)
+{
+  vector<double>& weights = GetUsingWeights();
+  double suma = 0.0;
+  double total = 0.0;
+
+  for(int i=0;i<GetClassifiersToUse();i++) {
+    Classifier *c = Classifiers.at(i);
+    suma += weights[i]*c->Average(ElementIndex, AttributeIndex);
+    total += weights[i];
+  }
+
+  return suma/total;
+}
 //---------------------------------------------------------------------------
 std::vector<double> Ensemble::MultipleAverage(int ElementIndex)
 {

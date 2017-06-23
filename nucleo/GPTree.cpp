@@ -238,6 +238,15 @@ double DecisionTree::Average(int ElementIndex)
   data->Classify(ElementIndex, 0, tree->GetRoot(), GetK(), &lastClassifyingNode);
   return lastClassifyingNode->fClass;
 }
+
+double DecisionTree::Average(int ElementIndex, int AttributeIndex)
+{
+  if (MultiobjectiveInstance::GetNumMultiobjectives() <= 0) {
+    throw std::logic_error("Don't specify the attribute index unless dealing with multiobjective instances");
+  }
+  data->Classify(ElementIndex, 0, tree->GetRoot(), GetK(), &lastClassifyingNode);
+  return lastClassifyingNode->NodePop[AttributeIndex - (data->GetNumVar() - MultiobjectiveInstance::GetNumMultiobjectives())];
+}
 std::vector<double> DecisionTree::MultipleAverage(int ElementIndex)
 {
   data->Classify(ElementIndex, 0, tree->GetRoot(), GetK(), &lastClassifyingNode);

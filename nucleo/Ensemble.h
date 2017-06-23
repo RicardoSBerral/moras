@@ -39,6 +39,7 @@ public:
   //virtual int Classify(int ElementIndex);
 
   virtual double Average(int ElementIndex);
+  virtual double Average(int ElementIndex, int AverageIndex);
   virtual std::vector<double> MultipleAverage(int ElementIndex);
   virtual std::vector<double> UnnormalizedDistribution(int ElementIndex);
 //  virtual double ClassificationCertainty(int ElementIndex, int &Class/*, 

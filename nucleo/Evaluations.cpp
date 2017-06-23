@@ -115,8 +115,16 @@ MSEEvaluation::MSEEvaluation(Classifier *clf, Data *data, string params) : Evalu
   rms = 0.0;
   double ww = 0.0;
   int Nvar = data->GetNumVar();
+  int dVar = Nvar-1;
+  if (!params.empty()) {
+    sscanf(params.c_str(), "%d", &dVar);
+  }
+  if (dVar >= Nvar) {
+    throw std::logic_error("The chosen attribute index is equal or greater than the number of attributes");
+  }
   for (int i = 0 ; i < data->GetNTotal(); i++) {
-    double d = clf->Average(i) - data->GetInstance(i)[Nvar-1];
+    double average = dVar == Nvar-1 ? clf->Average(i) : clf->Average(i, dVar);
+    double d = average - data->GetInstance(i)[dVar];
     // printf("Average[%d] = %f, Nvar-1 = %f, d = %f\n", i, clf->Average(i), data->GetInstance(i)[Nvar-1], d);
     rms += data->GetInstance(i).GetWeight() * d * d;
     ww += data->GetInstance(i).GetWeight();
