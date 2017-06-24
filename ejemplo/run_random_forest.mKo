@@ -1,0 +1,8 @@
+ndtr="$0" + i + "_train_cv" + j + ".cre"
+ndts="$0" + i + "_test_cv" + j + ".cre"
+dtr=CargaDatos(ndtr)
+dts=CargaDatos(ndts)
+
+rf=ConstruyeRandomForest(dtr, 101)
+Append(""+ErrSecClas(rf, dtr), "rf_train_error.txt")
+Append(""+ErrSecClas(rf, dts), "rf_test_error.txt")

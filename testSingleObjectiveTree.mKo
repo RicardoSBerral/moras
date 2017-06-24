@@ -1,0 +1,10 @@
+dtr=CargaDatos("$0.cre")
+dts=CargaDatos("$1.cre")
+
+CambiaColumnaDependiente(dtr, $2)
+CambiaColumnaDependiente(dts, $2)
+
+SetSplitCriterium(dtr, "MSECriterium")
+cart=ConstruyeCART(dtr,false)
+
+EvaluaClasificador(cart, dts, "MSEEvaluation")

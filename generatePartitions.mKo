@@ -1,0 +1,2 @@
+dt=CargaDatos("$0.cre")
+CreaConjuntosTrainAleat(dt,0,$1,"$0_")

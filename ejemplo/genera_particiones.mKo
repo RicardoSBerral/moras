@@ -1,0 +1,4 @@
+d=CargaDatos("breast.cre")
+i=0
+Repeat(CreaConjuntosTrainAleat(d,0,10,"breast" + i + "_"), 10, (i=i+1))
+

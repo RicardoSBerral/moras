@@ -35,3 +35,7 @@
 *.out
 *.app
 nucleo/cons
+
+# Cross-validation partitions
+*_test_cv?.cre
+*_train_cv?.cre

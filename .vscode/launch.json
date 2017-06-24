@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/nucleo/cons",
-            "args": ["script_reg.mKo"],
+            "args": ["script_reg_mforest.mKo"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

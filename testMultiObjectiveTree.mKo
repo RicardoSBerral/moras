@@ -1,0 +1,8 @@
+dtr=CargaDatos("$0.cre", "MultiobjectiveInstance", -$3)
+dts=CargaDatos("$1.cre", "MultiobjectiveInstance", -$3)
+
+SetSplitCriterium(dtr, "MultipleMSECriterium")
+mcart=ConstruyeCART(dtr,false)
+
+i=$2
+Repeat(EvaluaClasificador(mcart, dts, "MSEEvaluation", i), $3, (i=i+1))
