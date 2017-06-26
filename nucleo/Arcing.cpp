@@ -59,7 +59,7 @@ void ArcingTemplate::Build(Data *data, FuncionDeProgreso *fp)
   //Borra los clasificadores que sobran
   Classifiers.resize(i);
 
-  EndArc();
+  // EndArc();
 
   if (fp) fp->End();
 }
