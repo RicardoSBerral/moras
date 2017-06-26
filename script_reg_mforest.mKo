@@ -1,5 +1,5 @@
-mdtr=CargaDatos("wr.cre", "MultiobjectiveInstance", -1)
-mdts=CargaDatos("wtr.cre", "MultiobjectiveInstance", -1)
+mdtr=CargaDatos("wr.cre", "MultiobjectiveInstance", -4)
+mdts=CargaDatos("wtr.cre", "MultiobjectiveInstance", -4)
 
 SetSplitCriterium(mdtr, "MultipleMSECriterium")
 

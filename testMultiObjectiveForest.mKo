@@ -2,8 +2,7 @@ dtr=CargaDatos("$0.cre", "MultiobjectiveInstance", -$3)
 dts=CargaDatos("$1.cre", "MultiobjectiveInstance", -$3)
 
 SetSplitCriterium(dtr, "MultipleMSECriterium")
-mcart=ConstruyeCART(dtr,false)
+mforest=ConstruyeRandomForest(dtr,$4)
 
-InfoClasificador(mcart, 1)
 i=$2
-Repeat(EvaluaClasificador(mcart, dts, "MSEEvaluation", i), $3, (i=i+1))
+Repeat(EvaluaClasificador(mforest, dts, "MSEEvaluation", i), $3, (i=i+1))

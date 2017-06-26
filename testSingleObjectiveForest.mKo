@@ -1,7 +1,10 @@
 dtr=CargaDatos("$0.cre")
 dts=CargaDatos("$1.cre")
 
-SetSplitCriterium(dtr, "MSECriterium")
-cart=ConstruyeRandomForest(dtr,$2)
+CambiaColumnaDependiente(dtr, $2)
+CambiaColumnaDependiente(dts, $2)
 
-EvaluaClasificador(cart, dts, "MSEEvaluation")
+SetSplitCriterium(dtr, "MSECriterium")
+forest=ConstruyeRandomForest(dtr,$3)
+
+EvaluaClasificador(forest, dts, "MSEEvaluation")

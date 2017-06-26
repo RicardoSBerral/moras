@@ -7,4 +7,5 @@ CambiaColumnaDependiente(dts, $2)
 SetSplitCriterium(dtr, "MSECriterium")
 cart=ConstruyeCART(dtr,false)
 
+InfoClasificador(cart, 1)
 EvaluaClasificador(cart, dts, "MSEEvaluation")

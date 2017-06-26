@@ -1700,7 +1700,7 @@ void CreaConjuntosTrainAleat::CreateParams()
 {
   Parametros.push_back(new ParametroData());
   Parametro *p = new ParametroEntero(-1, 2100000000);
-  p->PonPropiedades(false, 0, "Tama�o train", "Ejemplos a utilizar como train");
+  p->PonPropiedades(false, 0, "Tamaño train", "Ejemplos a utilizar como train");
   Parametros.push_back(p);
   p = new ParametroEntero(1, 2100000000);
   p->PonPropiedades(false, 0, "Numero de particiones", "Particiones a realizar");
