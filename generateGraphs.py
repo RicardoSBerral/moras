@@ -5,6 +5,7 @@ import subprocess
 from math import sqrt
 from decimal import Decimal
 import re
+import csv
 
 class DataInfo:
     def __init__(self, data, n_variables, number_objectives):
@@ -15,8 +16,9 @@ class DataInfo:
 
 prog = "./nucleo/cons"
 n_partitions = 10
-min_size_forest = 50
+min_size_forest = 10
 max_size_forest = 100
+step_size_forest = 10
 
 data_wtr = DataInfo("wtr", 22, 5)
 data_cosmo = DataInfo("music2_z0.00_500_1e12", 30, 7)
@@ -29,10 +31,14 @@ def get_num_nodes (str):
     if m:
         return int(m.group(1))
 
-def average_with_sd (list):
+def average_and_sd (list):
     average = sum(list)/float(len(list))
     average_of_squares = sum(x**2 for x in list)/float(len(list))
     sd = sqrt(average_of_squares - average**2)
+    return average, sd
+
+def average_with_sd (list):
+    average, sd = average_and_sd (list)
     return "{:.2E} ± {:.3E}".format(Decimal(average), Decimal(sd))
 
 def get_results_multi (dataInfo, ret, matrix):
@@ -41,6 +47,14 @@ def get_results_multi (dataInfo, ret, matrix):
         m = re.match("\d+: ([\.\d]+)", lines[i])
         if m:
             matrix[i].append(float(m.group(1)))
+    return matrix
+
+def get_results_multi_variable_trees_number (dataInfo, ret, matrix, size):
+    lines = ret.splitlines()[-dataInfo.number_objectives-1:-1]
+    for i in xrange(0, dataInfo.number_objectives):
+        m = re.match("\d+: ([\.\d]+)", lines[i])
+        if m:
+            matrix[i][size].append(float(m.group(1)))
     return matrix
 
 def single_objective_tree(dataInfo):
@@ -71,7 +85,6 @@ def multi_objective_tree(dataInfo):
 def single_objective_forest_fixed_trees_number(dataInfo):
     for i in xrange(dataInfo.first_variable, dataInfo.n_variables):
         partial_results = []
-        partial_nodes = []
         for j in xrange(0, n_partitions):
             train_partition = dataInfo.data + "_train_cv" + str(j)
             test_partition = dataInfo.data + "_test_cv" + str(j)
@@ -81,15 +94,42 @@ def single_objective_forest_fixed_trees_number(dataInfo):
 
 def multi_objective_forest_fixed_trees_number(dataInfo):
     matrix = [[] for x in xrange(0, dataInfo.number_objectives)]
-    nodes = []
     for j in xrange(0, n_partitions):
         train_partition = dataInfo.data + "_train_cv" + str(j)
         test_partition = dataInfo.data + "_test_cv" + str(j)
         ret = call_program("testMultiObjectiveForest.mKo", train_partition, test_partition, dataInfo.first_variable, dataInfo.number_objectives, 10)
-        print ret
         matrix = get_results_multi(dataInfo, ret, matrix)
     for i in xrange(0, dataInfo.number_objectives):
         print "{:d}º variable: {}".format(i + dataInfo.first_variable, average_with_sd(matrix[i]))
+
+def single_objective_forest_variable_trees_number(dataInfo):
+    for i in xrange(dataInfo.first_variable, dataInfo.n_variables):
+        with open("{}_{:d}_variable.csv".format(dataInfo.data, i), 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for s in xrange(min_size_forest, max_size_forest, step_size_forest):
+                partial_results = []
+                for j in xrange(0, n_partitions):
+                    train_partition = dataInfo.data + "_train_cv" + str(j)
+                    test_partition = dataInfo.data + "_test_cv" + str(j)
+                    ret = call_program("testSingleObjectiveForest.mKo", train_partition, test_partition, i, s)
+                    partial_results.append(float(ret.splitlines()[-1]))
+                average, sd = average_and_sd(partial_results)
+                csvwriter.writerow([s, average, sd])
+
+def multi_objective_forest_variable_trees_number(dataInfo):
+    matrix = [[[] for y in xrange(min_size_forest, max_size_forest, step_size_forest)] for x in xrange(0, dataInfo.number_objectives)]
+    for s in xrange(min_size_forest, max_size_forest, step_size_forest):
+        for j in xrange(0, n_partitions):
+            train_partition = dataInfo.data + "_train_cv" + str(j)
+            test_partition = dataInfo.data + "_test_cv" + str(j)
+            ret = call_program("testMultiObjectiveForest.mKo", train_partition, test_partition, dataInfo.first_variable, dataInfo.number_objectives, s)
+            matrix = get_results_multi_variable_trees_number(dataInfo, ret, matrix, s)
+    for i in xrange(0, dataInfo.number_objectives):
+        with open("{}_{:d}_variable.csv".format(dataInfo.data, i), 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for s in xrange(min_size_forest, max_size_forest, step_size_forest):
+                average, sd = average_and_sd(matrix[i][s])
+                csvwriter.writerow([s, average, sd])
 
 def main():
 
@@ -101,57 +141,44 @@ def main():
     print "\n***** WTR *****"
 
     print "\nSINGLE-OBJECTIVE TREE"
-    single_objective_tree(data_wtr)
+    # single_objective_tree(data_wtr)
 
     print "\nMULTI-OBJECTIVE TREE"
-    multi_objective_tree(data_wtr)
+    # multi_objective_tree(data_wtr)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 10 TREES"
-    single_objective_forest_fixed_trees_number(data_wtr)
+    # single_objective_forest_fixed_trees_number(data_wtr)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
-    multi_objective_forest_fixed_trees_number(data_wtr)
+    # multi_objective_forest_fixed_trees_number(data_wtr)
+
+    print "\nSINGLE-OBJECTIVE FOREST WITH VARIABLE TREES"
+    single_objective_forest_variable_trees_number(data_wtr)
+
+    print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
+    multi_objective_forest_variable_trees_number(data_wtr)
 
     print "\n***** COSMO *****"
 
     print "\nSINGLE-OBJECTIVE TREE"
-    single_objective_tree(data_cosmo)
+    # single_objective_tree(data_cosmo)
 
     print "\nMULTI-OBJECTIVE TREE"
-    multi_objective_tree(data_cosmo)
+    # multi_objective_tree(data_cosmo)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 10 TREES"
-    single_objective_forest_fixed_trees_number(data_cosmo)
+    # single_objective_forest_fixed_trees_number(data_cosmo)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
-    multi_objective_forest_fixed_trees_number(data_wtr)
+    # multi_objective_forest_fixed_trees_number(data_cosmo)
+
+    print "\nSINGLE-OBJECTIVE FOREST WITH VARIABLE TREES"
+    single_objective_forest_variable_trees_number(data_cosmo)
+
+    print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
+    multi_objective_forest_variable_trees_number(data_cosmo)
+
+    # Para cada ejemplo, Classify
+    # ErrSecClass
 
 main()
-
-# # Para cada ejemplo, Classify
-# # ErrSecClass
-# echo "Single-objective forest"
-# for size_forest in $(seq $min_size_forest 10 $max_size_forest)
-# do
-#     for j in $(seq 0 1 $n_partitions_zero_based)
-#     do
-#         train_partition=${data}_train_cv${j}
-#         test_partition=${data}_test_cv${j}
-#         partial_results[$j]=$($prog testSingleObjectiveForest.mKo $train_partition $test_partition $size_forest | tail -1)
-#     done
-#     results[$i]=$( average partial_results )
-#     echo "With $size_forest trees: ${results[${i}]}"
-# done
-
-# echo "Multi-objective forest"
-# for size_forest in $(seq $min_size_forest 10 $max_size_forest)
-# do
-#     for j in $(seq 0 1 $n_partitions_zero_based)
-#     do
-#         train_partition=${data}_train_cv${j}
-#         test_partition=${data}_test_cv${j}
-#         partial_results[$j]=$($prog testSingleObjectiveForest.mKo $train_partition $test_partition $size_forest | tail -1)
-#     done
-#     results[$i]=$( average partial_results )
-#     echo "With $size_forest trees: ${results[${i}]}"
-# done

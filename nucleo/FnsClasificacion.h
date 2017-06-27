@@ -609,6 +609,40 @@ class SequentialError : public IntefazFuncion, Funcion
 
 };
 //---------------------------------------------------------------------------
+class RegressionError : public IntefazFuncion, Funcion
+{
+  protected:
+    Matriz *err;
+
+  public:
+    RegressionError(std::vector<Mandato *> mands) : Funcion(mands) {
+      err = 0;
+      CreateParams();
+    }
+    RegressionError() : Funcion() { err = 0; CreateParams();}
+    ~RegressionError();
+
+  public:
+    void CreateParams();
+    virtual unsigned NumParams(){return 4;}
+    virtual Funcion* CrearFuncion() {return new RegressionError();}
+    virtual std::string NombreFuncion() {return StringRepository::GetString("RegressionError");}
+
+    virtual Mandato* Ejecutar();
+
+    virtual bool EsDatos(){return true;}
+    virtual Tipo* DameTipo(){return Tipo::TMatriz();}
+
+    virtual std::string ComoCadena();
+    virtual double ComoNumero(){return 0;}
+    virtual int ComoEntero(){return (long int)err;}
+    virtual bool ComoBooleano(){return err;}
+    virtual void* ComoDatos(){return err;}
+
+    static void DarDeAlta();
+
+};
+//---------------------------------------------------------------------------
 class ClassificationMatrix : public IntefazFuncion, Funcion
 {
   protected:

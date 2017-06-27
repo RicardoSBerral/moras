@@ -47,6 +47,8 @@ public:
   std::vector<double> Margen(int ini, int fin, int div=-1);
   virtual void SecuencialError(int first, int last, std::vector<double> *errors,
               std::vector<double> *inderrs=0, std::vector<int> *final_class=0);
+  virtual void RegressionError(int first, int last, std::vector<double> *errors,
+              int dVar=-1);
   virtual void SecuencialClassify(int ElementIndex,
                        std::vector<int> *classes, std::vector<int> *indclss=0);
   //

@@ -44,6 +44,7 @@ StringRepositoryEnglish::StringRepositoryEnglish():StringRepository()
    strings["EvaluateClassifier"] 	= "EvaluateClassifier";
    strings["Mrse"] 	= "Mrse";
    strings["SequentialError"] 	= "SequentialError";
+   strings["RegressionError"] 	= "RegressionError";
    strings["ClassificationMatrix"] 	= "ClassificationMatrix";
    strings["ConfusionMatrix"] 	= "ConfusionMatrix";
    strings["Margin"] 	= "Margin";
@@ -96,6 +97,7 @@ StringRepositorySpanish::StringRepositorySpanish():StringRepository()
    strings["EvaluateClassifier"] 	= "EvaluaClasificador";
    strings["Mrse"] 	= "Mrse";
    strings["SequentialError"] 	= "ErrSecClas";
+   strings["RegressionError"] 	= "ErrReg";
    strings["ClassificationMatrix"] 	= "MatrizClasif";
    strings["ConfusionMatrix"] 	= "MatrizConfusion";
    strings["Margin"] 	= "Margen";

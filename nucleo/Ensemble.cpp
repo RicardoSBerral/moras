@@ -516,6 +516,24 @@ void Ensemble::SecuencialError(int first, int last, vector<double> *errors,
   if (indclss) delete indclss;
 }
 //---------------------------------------------------------------------
+
+void Ensemble::RegressionError(int first, int last, vector<double> *errors,
+                            int dVar)
+{
+  int Nvar = data->GetNumVar();
+  errors->clear();
+  errors->resize(last - first + 1, 0.0);
+  if (dVar < 0 || dVar >= Nvar) {
+    dVar = Nvar - 1;
+  }
+
+  for (int i = first; i <= last; i++) {
+    double average = dVar == Nvar-1 ? Average(i) : Average(i, dVar);
+    double d = average - data->GetInstance(i)[dVar];
+    (*errors)[i - first] = d;
+  }
+}
+//---------------------------------------------------------------------
 void Ensemble::OrdenarClasificadoresPorOrdenOriginal()
 {
   if (OrdenOriginal.size()>0) {

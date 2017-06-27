@@ -105,6 +105,7 @@ void DarDeAltaFnsClasificacion()
   EvaluateClassifier::DarDeAlta();
   Mrse::DarDeAlta();
   SequentialError::DarDeAlta();
+  RegressionError::DarDeAlta();
   ClassificationMatrix::DarDeAlta();
   ConfusionMatrix::DarDeAlta();
   Margin::DarDeAlta();
@@ -1342,6 +1343,83 @@ Mandato* SequentialError::Ejecutar()
 }
 //---------------------------------------------------------------------------
 string SequentialError::ComoCadena()
+{
+  string cad="", sep="";
+  for(int i=0;i<err->columnas();i++) {
+    cad = cad + sep + Mandato::ACad((*err)[0][i]);
+    sep = "\t";
+  }
+  return cad;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+RegressionError::~RegressionError()
+{
+  if(err) delete err;
+}
+void RegressionError::DarDeAlta()
+{
+  ifns().AnadirInterfazFuncion(new RegressionError(), "Classifiers");
+}
+//---------------------------------------------------------------------------
+void RegressionError::CreateParams()
+{
+  Parametros.push_back(new ParametroEnsemble());
+  Parametros.push_back(new ParametroData());
+  Parametro *pfs = new ParametroFicheroSalida();
+  pfs->PonPropiedades(false, 0, "Output file",
+                "File name where the individual classifications are stored");
+  Parametros.push_back(pfs);
+  *pfs = new ParametroEntero();
+  pfs->PonPropiedades(true, 0, "Objective index",
+                "Index of the variable we want to calculate the error of");
+  Parametros.push_back(pfs);
+}
+//---------------------------------------------------------------------------
+Mandato* RegressionError::Ejecutar()
+{
+  int ini, fin, dVar;
+  string nom_fich;
+  vector<double> *inderrs = new vector<double>();
+
+  Param(0)->Ejecutar();
+  Param(1)->Ejecutar();
+  Param(2)->Ejecutar();
+
+  Ensemble *ens = (Ensemble*) Param(0)->ComoDatos();
+  Data *dat = (Data*) Param(1)->ComoDatos();
+  nom_fich = Param(2)->ComoCadena();
+  if (NumParamsAsignados() >= 4) {
+    Param(3)->Ejecutar();
+    dVar = Param(3)->ComoEntero();
+  } else {
+    dVar = dat->GetNumVar() - 1;
+  }
+
+  ens->SetData(dat);
+  ini = 0;
+  fin = dat->GetNTotal()-1;
+
+  vector<double> errores;
+  ens->RegressionError(ini, fin, &errores, dVar);
+
+  if (err) delete err;
+  err = new Matriz(1, (int) errores.size());
+  for (int i=0; i < (int) errores.size(); i++) {
+    (*err)[0][i] = errores[i];
+  }  
+
+  FILE *f=fopen(nom_fich.c_str(), "a");
+  for (unsigned i=0; i < errores.size(); i++) {
+    fprintf(f, "%f\t%f\n", dat->GetInstance(i)[dVar], errores[i]);
+  }
+  fclose(f);
+
+  return this;
+}
+//---------------------------------------------------------------------------
+string RegressionError::ComoCadena()
 {
   string cad="", sep="";
   for(int i=0;i<err->columnas();i++) {
