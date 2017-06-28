@@ -157,25 +157,25 @@ def main():
     print "\n***** WTR *****"
 
     print "\nSINGLE-OBJECTIVE TREE"
-    single_objective_tree(data_wtr)
+    # single_objective_tree(data_wtr)
 
     print "\nMULTI-OBJECTIVE TREE"
-    multi_objective_tree(data_wtr)
+    # multi_objective_tree(data_wtr)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 10 TREES"
-    single_objective_forest_fixed_trees_number(data_wtr)
+    # single_objective_forest_fixed_trees_number(data_wtr)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
-    multi_objective_forest_fixed_trees_number(data_wtr)
+    # multi_objective_forest_fixed_trees_number(data_wtr)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 100 TREES"
-    single_objective_forest_fixed_trees_number(data_wtr, 100)
+    # single_objective_forest_fixed_trees_number(data_wtr, 100)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 100 TREES"
-    multi_objective_forest_fixed_trees_number(data_wtr, 100)
+    # multi_objective_forest_fixed_trees_number(data_wtr, 100)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH VARIABLE TREES"
-    single_objective_forest_variable_trees_number(data_wtr)
+    # single_objective_forest_variable_trees_number(data_wtr)
 
     print "\nMULTI-OBJECTIVE FOREST WITH VARIABLE TREES"
     multi_objective_forest_variable_trees_number(data_wtr)
@@ -186,22 +186,22 @@ def main():
     print "\n***** COSMO *****"
 
     print "\nSINGLE-OBJECTIVE TREE"
-    single_objective_tree(data_cosmo)
+    # single_objective_tree(data_cosmo)
 
     print "\nMULTI-OBJECTIVE TREE"
-    multi_objective_tree(data_cosmo)
+    # multi_objective_tree(data_cosmo)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 10 TREES"
-    single_objective_forest_fixed_trees_number(data_cosmo)
+    # single_objective_forest_fixed_trees_number(data_cosmo)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
-    multi_objective_forest_fixed_trees_number(data_cosmo)
+    # multi_objective_forest_fixed_trees_number(data_cosmo)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 100 TREES"
-    single_objective_forest_fixed_trees_number(data_cosmo, 100)
+    # single_objective_forest_fixed_trees_number(data_cosmo, 100)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 100 TREES"
-    multi_objective_forest_fixed_trees_number(data_cosmo, 100)
+    # multi_objective_forest_fixed_trees_number(data_cosmo, 100)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH VARIABLE TREES"
     single_objective_forest_variable_trees_number(data_cosmo)
