@@ -5,10 +5,10 @@
             "name": "C++ Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/nucleo/cons",
-            "args": ["script_reg_mforest.mKo"],
+            "cwd": "${workspaceRoot}/tests",
+            "program": "../nucleo/cons",
+            "args": ["script_reg_tree.mKo"],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,
             "linux": {
@@ -25,8 +25,8 @@
                 "MIMode": "lldb"
             },
             "windows": {
-                "program": "/mnt/d/Code/TFG/moras/nucleo/cons",
-                "cwd": "/mnt/d/Code/TFG/moras",
+                "cwd": "/mnt/c/Users/ricar/Code/moras/tests",
+                "program": "../nucleo/cons",
                 "MIMode": "gdb",
                 "setupCommands": [
                     {
@@ -42,7 +42,7 @@
                     "debuggerPath": "/usr/bin/gdb"
                 },
                 "sourceFileMap": {
-                    "/mnt/d": "D:\\"
+                    "/mnt/c": "C:\\"
                 }
             }
         },
