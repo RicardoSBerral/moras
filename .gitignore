@@ -1,3 +1,11 @@
+# Executables
+*
+!*/
+!*.*
+!*Doxyfile
+!*Makefile
+!*LICENSE
+
 # Prerequisites
 *.d
 
@@ -34,8 +42,15 @@
 *.exe
 *.out
 *.app
+*.jar
 nucleo/cons
 
 # Cross-validation partitions
 *_test_cv?.cre
 *_train_cv?.cre
+
+# Results
+*.png
+*.csv
+*.png
+*.svg

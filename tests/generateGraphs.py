@@ -14,24 +14,27 @@ class DataInfo:
         self.number_objectives = number_objectives
         self.first_variable = n_variables - number_objectives
 
-prog = "./nucleo/cons"
+prog = "../nucleo/cons"
 n_partitions = 10
 min_size_forest = 10
-max_size_forest = 100
-step_size_forest = 10
+max_size_forest = 90
+step_size_forest = 20
 
-data_wtr = DataInfo("wtr", 22, 5)
+data_music = DataInfo("wtr", 22, 5)
 data_cosmo = DataInfo("music2_z0.00_500_1e12", 30, 7)
 
+def call_command (command):
+    return subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
+
 def call_program (*args):
-    return subprocess.Popen(prog + " " + " ".join(str(x) for x in args), shell=True, stdout=subprocess.PIPE).stdout.read()
+    return call_command(prog + " " + " ".join(str(x) for x in args))
 
 def call_gnuplot (args_dictionary):
     args_string = ""
     for var,value in args_dictionary.iteritems():
         args_string += "{}='{}';".format(var,value)
     command = "gnuplot -e \"{}\" plotForestVariableSize.gpi".format(args_string)
-    return subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
+    return call_command(command)
 
 def get_num_nodes (str):
     m = re.search("Num nodos: (\d+) ", str)
@@ -141,67 +144,69 @@ def multi_objective_forest_variable_trees_number(data_info):
 
 def generate_graphs(data_info):
     for i in xrange(data_info.first_variable, data_info.n_variables):
+        filename = "{}_{:d}_variable".format(data_info.data, i)
         call_gnuplot({
-            "filename": "{}_{:d}_variable.png".format(data_info.data, i),
+            "filename": filename,
             "data": data_info.data,
             "variable": str(i),
         })
+        call_command("inkscape -f {}.svg -e {}.png -h 2000 -b \"#ffffff\"".format(filename, filename))
 
 def main():
 
     print "\n***** GENERATE PARTITIONS *****"
 
-    call_program("generatePartitions.mKo", data_wtr.data, n_partitions)
+    call_program("generatePartitions.mKo", data_music.data, n_partitions)
     call_program("generatePartitions.mKo", data_cosmo.data, n_partitions)
 
-    print "\n***** WTR *****"
+    print "\n***** MUSIC *****"
 
     print "\nSINGLE-OBJECTIVE TREE"
-    # single_objective_tree(data_wtr)
+    single_objective_tree(data_music)
 
     print "\nMULTI-OBJECTIVE TREE"
-    # multi_objective_tree(data_wtr)
+    multi_objective_tree(data_music)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 10 TREES"
-    # single_objective_forest_fixed_trees_number(data_wtr)
+    single_objective_forest_fixed_trees_number(data_music)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
-    # multi_objective_forest_fixed_trees_number(data_wtr)
+    multi_objective_forest_fixed_trees_number(data_music)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 100 TREES"
-    # single_objective_forest_fixed_trees_number(data_wtr, 100)
+    single_objective_forest_fixed_trees_number(data_music, 100)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 100 TREES"
-    # multi_objective_forest_fixed_trees_number(data_wtr, 100)
+    multi_objective_forest_fixed_trees_number(data_music, 100)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH VARIABLE TREES"
-    # single_objective_forest_variable_trees_number(data_wtr)
+    single_objective_forest_variable_trees_number(data_music)
 
     print "\nMULTI-OBJECTIVE FOREST WITH VARIABLE TREES"
-    multi_objective_forest_variable_trees_number(data_wtr)
+    multi_objective_forest_variable_trees_number(data_music)
 
     print "\nGENERATE GRAPHS"
-    generate_graphs(data_wtr)
+    generate_graphs(data_music)
 
     print "\n***** COSMO *****"
 
     print "\nSINGLE-OBJECTIVE TREE"
-    # single_objective_tree(data_cosmo)
+    single_objective_tree(data_cosmo)
 
     print "\nMULTI-OBJECTIVE TREE"
-    # multi_objective_tree(data_cosmo)
+    multi_objective_tree(data_cosmo)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 10 TREES"
-    # single_objective_forest_fixed_trees_number(data_cosmo)
+    single_objective_forest_fixed_trees_number(data_cosmo)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 10 TREES"
-    # multi_objective_forest_fixed_trees_number(data_cosmo)
+    multi_objective_forest_fixed_trees_number(data_cosmo)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH 100 TREES"
-    # single_objective_forest_fixed_trees_number(data_cosmo, 100)
+    single_objective_forest_fixed_trees_number(data_cosmo, 100)
 
     print "\nMULTI-OBJECTIVE FOREST WITH 100 TREES"
-    # multi_objective_forest_fixed_trees_number(data_cosmo, 100)
+    multi_objective_forest_fixed_trees_number(data_cosmo, 100)
 
     print "\nSINGLE-OBJECTIVE FOREST WITH VARIABLE TREES"
     single_objective_forest_variable_trees_number(data_cosmo)

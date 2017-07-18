@@ -1,17 +1,17 @@
 #!/usr/bin/env gnuplot
 
-filename_png = sprintf("%s.png", filename)
+filename_svg = sprintf("%s.svg", filename)
 single_objective_file = sprintf("%s_%s_variable_single.csv",data,variable)
 multi_objective_file = sprintf("%s_%s_variable_multi.csv",data,variable)
 
-set terminal png
+set terminal svg
 set encoding utf8
-set output filename_png
-
+set output filename_svg
+set termoption enhanced
 
 set autoscale
-set xlabel "Max trees {/Italic k}"
-set ylabel "MSE and {/Italic s}"
+set xlabel "Max trees ({/:Italic x})"
+set ylabel "MSE and SD ({/:Italic y})"
 set style data linespoints
 
 plot single_objective_file using 1:2 title "Single-objective MSE", \
